@@ -19,13 +19,13 @@ Generate self-contained HTML files for technical diagrams, visualizations, and d
 Before doing anything else, check if the installed version is current:
 
 ```bash
-cd ~/.claude/skills/visual-explainer && git fetch origin --quiet 2>/dev/null && LOCAL=$(git rev-parse HEAD) && REMOTE=$(git rev-parse origin/main) && if [ "$LOCAL" != "$REMOTE" ]; then BEHIND=$(git rev-list HEAD..origin/main --count); echo "UPDATE_AVAILABLE: $BEHIND commits behind origin/main"; else echo "UP_TO_DATE"; fi
+cd ~/.claude/skills/visual-explainer && git fetch upstream --quiet 2>/dev/null && LOCAL=$(git rev-parse HEAD) && REMOTE=$(git rev-parse upstream/main 2>/dev/null || echo "$LOCAL") && if [ "$LOCAL" != "$REMOTE" ]; then BEHIND=$(git rev-list HEAD..upstream/main --count); echo "UPDATE_AVAILABLE: $BEHIND commits behind upstream/main"; else echo "UP_TO_DATE"; fi
 ```
 
 - If `UP_TO_DATE` → continue silently, do not mention it.
 - If `UPDATE_AVAILABLE` → show this notice before anything else:
 
-> **visual-explainer update available** — $BEHIND new commit(s). Run `cd ~/.claude/skills/visual-explainer && git pull` to update.
+> **visual-explainer update available** — $BEHIND new commit(s) from upstream (nicobailon/visual-explainer). Run `cd ~/.claude/skills/visual-explainer && git fetch upstream && git merge upstream/main` to merge, then `git push origin main` to sync your fork.
 
 Then continue with the user's request normally.
 
