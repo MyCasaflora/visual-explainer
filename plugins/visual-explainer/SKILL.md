@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
 metadata:
   author: nicobailon
-  version: "0.6.3"
+  version: "0.6.4"
 ---
 
 # Visual Explainer
@@ -13,6 +13,42 @@ metadata:
 Generate self-contained HTML files for technical diagrams, visualizations, and data tables. Always open the result in the browser. Never fall back to ASCII art when this skill is loaded.
 
 **Proactive table rendering.** When you're about to present tabular data as an ASCII box-drawing table in the terminal (comparisons, audits, feature matrices, status reports, any structured rows/columns), generate an HTML page instead. The threshold: if the table has 4+ rows or 3+ columns, it belongs in the browser. Don't wait for the user to ask — render it as HTML automatically and tell them the file path. You can still include a brief text summary in the chat, but the table itself should be the HTML page.
+
+## Update Check (on every invocation)
+
+Before doing anything else, check if the installed version is current:
+
+```bash
+cd ~/.claude/skills/visual-explainer && git fetch origin --quiet 2>/dev/null && LOCAL=$(git rev-parse HEAD) && REMOTE=$(git rev-parse origin/main) && if [ "$LOCAL" != "$REMOTE" ]; then BEHIND=$(git rev-list HEAD..origin/main --count); echo "UPDATE_AVAILABLE: $BEHIND commits behind origin/main"; else echo "UP_TO_DATE"; fi
+```
+
+- If `UP_TO_DATE` → continue silently, do not mention it.
+- If `UPDATE_AVAILABLE` → show this notice before anything else:
+
+> **visual-explainer update available** — $BEHIND new commit(s). Run `cd ~/.claude/skills/visual-explainer && git pull` to update.
+
+Then continue with the user's request normally.
+
+## Discovery Mode (no clear intent)
+
+When the skill is invoked without a specific command or clear directive — for example the user types `/visual-explainer`, "use visual-explainer", or "visualize this" without specifying what kind — **do not guess**. Present this menu and wait:
+
+**visual-explainer — Was möchtest du erstellen?**
+
+| # | Command | Wann nutzen |
+|---|---------|-------------|
+| 1 | `/generate-web-diagram` | Architektur, Flows, Systeme als interaktives Diagramm |
+| 2 | `/generate-visual-plan` | Implementierungsplan visuell darstellen |
+| 3 | `/generate-slides` | Magazine-Qualität Slide Deck / Präsentation |
+| 4 | `/diff-review` | Git Diff als visuelles Code-Review mit Architekturvergleich |
+| 5 | `/plan-review` | Plan gegen Codebase prüfen + Risikoanalyse |
+| 6 | `/project-recap` | Projekt-Snapshot für Context-Switching |
+| 7 | `/fact-check` | Dokument gegen echten Code verifizieren |
+| 8 | `/share` | HTML-Seite auf Vercel deployen → Live-URL |
+
+Wähle eine Nummer oder beschreibe kurz, was du brauchst.
+
+After showing this menu, **wait for the user's response**. Map number inputs (1–8) directly to the corresponding command. Map descriptive answers to the best matching command. Only then proceed with execution.
 
 ## Available Commands
 
